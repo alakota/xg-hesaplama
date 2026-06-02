@@ -32,6 +32,9 @@
 
     html {
       scroll-behavior: smooth;
+      width: 100%;
+      max-width: 100%;
+      overflow-x: hidden;
     }
 
     body {
@@ -40,7 +43,12 @@
       background: linear-gradient(140deg, #06101d, #0b1220 45%, #111827);
       color: var(--text);
       padding-bottom: calc(96px + var(--safe-bottom));
-      overscroll-behavior: none;
+      overscroll-behavior-y: auto;
+      width: 100%;
+      max-width: 100%;
+      overflow-x: hidden;
+      overflow-y: auto;
+      min-height: 100dvh;
     }
 
     header {
@@ -85,12 +93,14 @@
     }
 
     main {
+      width: 100%;
       max-width: 1180px;
       margin: auto;
       padding: 12px 16px 36px;
       display: grid;
-      grid-template-columns: 1.25fr .9fr;
+      grid-template-columns: minmax(0, 1.25fr) minmax(0, .9fr);
       gap: 16px;
+      overflow-x: hidden;
     }
 
     .card {
@@ -99,6 +109,9 @@
       border-radius: 22px;
       padding: 16px;
       box-shadow: 0 20px 60px rgba(0,0,0,.25);
+      min-width: 0;
+      max-width: 100%;
+      overflow: hidden;
     }
 
     h2 {
@@ -673,6 +686,22 @@
       border-radius: 999px;
     }
 
+
+    .explainer {
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 12.5px;
+      line-height: 1.45;
+      background: rgba(125, 211, 252, .08);
+      border: 1px solid rgba(125, 211, 252, .18);
+      border-radius: 14px;
+      padding: 11px;
+    }
+
+    .explainer strong {
+      color: var(--text);
+    }
+
     .metrics {
       margin-top: 14px;
       display: grid;
@@ -761,7 +790,9 @@
       }
 
       header {
-        padding: 18px 12px 8px;
+        padding: 18px 10px 8px;
+        max-width: 100%;
+        overflow-x: hidden;
       }
 
       header p {
@@ -769,18 +800,26 @@
       }
 
       .mode-switch {
-        padding: 0 12px;
+        width: 100%;
+        max-width: 100%;
+        padding: 0 8px;
       }
 
       main {
-        grid-template-columns: 1fr;
-        padding: 8px 12px 28px;
+        width: 100%;
+        max-width: 100%;
+        grid-template-columns: minmax(0, 1fr);
+        padding: 8px 8px 28px;
         gap: 12px;
+        overflow-x: hidden;
       }
 
       .card {
-        padding: 12px;
+        width: 100%;
+        max-width: 100%;
+        padding: 10px;
         border-radius: 18px;
+        overflow: hidden;
       }
 
       .stage-tabs {
@@ -800,9 +839,12 @@
       }
 
       #pitch {
-        max-height: none;
-        height: min(72vh, 650px);
-        aspect-ratio: auto;
+        width: min(100%, 430px);
+        height: auto;
+        aspect-ratio: 68 / 105;
+        max-height: 70dvh;
+        margin-left: auto;
+        margin-right: auto;
       }
 
       .marker,
@@ -825,7 +867,11 @@
       }
 
       .goal {
-        min-height: 205px;
+        width: 100%;
+        max-width: 430px;
+        min-height: 190px;
+        margin-left: auto;
+        margin-right: auto;
       }
 
       h2 {
@@ -847,11 +893,13 @@
       }
 
       #pitch {
-        height: 67vh;
+        width: min(100%, 390px);
+        max-height: 66dvh;
       }
 
       .goal {
-        min-height: 185px;
+        max-width: 390px;
+        min-height: 172px;
       }
 
       .mobile-score-item strong {
@@ -870,7 +918,8 @@
       }
 
       #pitch {
-        height: 63vh;
+        width: min(100%, 340px);
+        max-height: 62dvh;
       }
     }
   </style>
@@ -1100,6 +1149,13 @@
           <strong id="xgcValue">0.00</strong>
           <div class="bar"><div id="xgcBar"></div></div>
         </div>
+      </div>
+
+
+      <div class="explainer">
+        <strong>xGC / PSxG nedir?</strong>
+        Şut kaleyi bulduktan sonra, topun kalede gittiği nokta ve kalecinin konumuna göre gol olma ihtimalidir.
+        Bu değer sadece <strong>şut kaleyi bulduğu senaryoda</strong> anlamlıdır; dışarı giden veya bloklanan şutlarda normal xG daha önemlidir.
       </div>
 
       <div class="pill-row">
@@ -2039,6 +2095,20 @@
     window.addEventListener("pointerup", endDrag);
     window.addEventListener("pointercancel", endDrag);
     window.addEventListener("resize", drawShotLine);
+
+    function allowPageScrollWithWheel(event) {
+      if (!drag) {
+        window.scrollBy({
+          top: event.deltaY,
+          left: 0,
+          behavior: "auto"
+        });
+      }
+    }
+
+    pitch.addEventListener("wheel", allowPageScrollWithWheel, { passive: true });
+    goal.addEventListener("wheel", allowPageScrollWithWheel, { passive: true });
+
 
     normalModeBtn.addEventListener("click", () => setMode("normal"));
     penaltyModeBtn.addEventListener("click", () => setMode("penalty"));
